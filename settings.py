@@ -18,15 +18,15 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 
 options = {
   'dev' : {
-    'mongo_database' : {'host' : os.environ.get('MONGODB_URL'), 'port' : 27017, 'db' : os.environ.get('DB_NAME')},
+    'mongo_database' : {'host' : os.environ.get('MONGODB_URL'), 'port' : 10012, 'db' : os.environ.get('DB_NAME')},
     'base_url' : os.environ.get('BASE_URL'),
   },
   'test' : {
-    'mongo_database' : {'host' : os.environ.get('MONGODB_URL'), 'port' : 27017, 'db' : os.environ.get('DB_NAME')},
+    'mongo_database' : {'host' : os.environ.get('MONGODB_URL'), 'port' : 10012, 'db' : os.environ.get('DB_NAME')},
     'base_url' : os.environ.get('BASE_URL'),
   },
   'prod' : {
-    'mongo_database' : {'host' : os.environ.get('MONGODB_URL'), 'port' : 27017, 'db' : os.environ.get('DB_NAME')},
+    'mongo_database' : {'host' : os.environ.get('MONGODB_URL'), 'port' : 10012, 'db' : os.environ.get('DB_NAME')},
     'base_url' : os.environ.get('BASE_URL'),
   }
 }
@@ -35,7 +35,7 @@ default_options = {
   'active_theme': "default",
   'site_title': "The Conversation",
   'site_intro': "This is a website where people talk",
-  
+
   'project_root': os.path.abspath(os.path.join(os.path.dirname(__file__))),
 
   # twiter details
@@ -52,8 +52,8 @@ default_options = {
   'sendgrid_secret': '',
 
   # hackpad details
-  'hackpad_oauth_client_id':'', 
-  'hackpad_oauth_secret':'', 
+  'hackpad_oauth_client_id':'',
+  'hackpad_oauth_secret':'',
   'hackpad_domain':'',
 
   # google api key
@@ -86,8 +86,8 @@ default_options = {
     'manage_disqus',
     'view_post_sort_score'
   ],
-  'user_capabilities': [], 
-  
+  'user_capabilities': [],
+
   'module_dir': os.path.join(PROJECT_ROOT, 'templates/modules')
 }
 
@@ -113,4 +113,3 @@ def get(key):
     return v
 
   return default_options.get(key)
-
