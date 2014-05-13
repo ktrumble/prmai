@@ -39,13 +39,13 @@ default_options = {
   'project_root': os.path.abspath(os.path.join(os.path.dirname(__file__))),
 
   # twiter details
-  'twitter_consumer_key' : '',
-  'twitter_consumer_secret' : '',
+  'twitter_consumer_key' : 'RWtVxwBYW3oV6R1iT5AcHUU0Z',
+  'twitter_consumer_secret' : 'do0xxnQRIkLNwqHIcfSDujNKCbDcafPzyqZSl0JkPUFpf4OAJ7',
 
   # disqus details
-  'disqus_public_key': '',
-  'disqus_secret_key': '',
-  'disqus_short_code': '',
+  'disqus_public_key': 'RnQKGGN0DiNNS2EFTuKC1mGgWXv4EjznaTUyIziPA8ialJsrEuF5rS0VzzwfhnJI',
+  'disqus_secret_key': 'GgaXoCgLPWlnRwVRC1WRYqhBn5WVaawpU3umkDgskup7KPoprIm5aZc8A8BGNS0u',
+  'disqus_short_code': 'generaluidev',
 
   # sendgrid details
   'sendgrid_user': '',
