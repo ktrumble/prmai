@@ -1,0 +1,325 @@
+{% extends '../base.html' %}
+
+{% block body_class %}conversation{% end %}
+
+{% block precontent %}
+  <div class="tools tools-mobile visible-xs">
+    <b>Welcome!</b>
+    &nbsp;
+    <a href="/posts/welcome-to-the-new-usvcom#comment-1066691905">Posting guidelines</a>
+    |
+    <a href="https://play.google.com/store/apps/details?id=com.connectedio.usvmobile" target="_blank">Android app</a>
+  </div>
+{% end %}
+
+{% block content %}
+
+  <div id="main" role="main">    
+    <div class="row">
+      <div class="col-md-8 col-md-push-4 col-sm-12" id="posts">
+
+        {% if msg == "success" and new_post %}
+          <div class="alert alert-success" style="color: #333">
+            <p style="margin-top:0"><strong>Thanks!</strong> &nbsp; Your post has been published.</p>
+            <p>Here's the link: <a href="/posts/{{ new_post['slug'] }}">http://usv.com/posts/{{ new_post['slug'] }}</a>. </p>
+            <p style="margin: 10px 0 0"> 
+             
+              <a href="https://twitter.com/share" class="twitter-share-button" data-url="{{ template_helpers.post_permalink(new_post) }}" data-text="{{ new_post['title'] }}" data-via="usvcommunity" data-size="large" data-count="none">Tweet it out</a>
+              <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+            </p>
+            
+            {% if 'disqus_user_id' in user_obj.keys() and 'disqus' not in user_obj.keys() %}
+            <div class="alert alert-danger" style="margin: 10px 0 0">
+              <b>Yowzas!</b> Your connection to Disqus has expired.  <br /><a href="/auth/disqus">Click here to reauthorize</a> and receive email notifications of comments on your post.
+            </div>
+            {% end %}
+            
+            {% if 'disqus_user_id' not in user_obj.keys() and 'disqus' not in user_obj.keys() %}
+            <div class="alert alert-warning" style="margin: 10px 0 0">
+              <b><a href="/auth/disqus">Connect to Disqus</a></b> to receive emails notifications of new comments on your post.
+            </div>
+            {% end %}
+            
+          </div>
+        {% end %}
+        
+        {% if len(featured_posts) > 0 %}
+        <div class="subsection section-heading day-heading featured clearfix">
+          <h2 class="pull-left">
+            FEATURED:
+          </h2>
+          <a href="/featured" class="pull-right more">More featured posts</a>
+        </div>
+        <ul id="pinned" class="feed">
+          {% for p in featured_posts %}
+          <li class="post">
+            {% include post_snippet_reverse.html %}
+          </li>
+          {% end %}
+        </ul>
+        {% end %}
+        
+        <div id="todays-posts">
+        {% include daily_posts_list_snippet.html %}
+        </div>
+        
+        {% if len(posts) < 5 %}
+        {% module daily_posts_list_snippet(day=previous_day, datetime=datetime, posts=previous_day_posts, current_user_can=current_user_can, midpoint=midpoint, is_today=False, day_str=day_str, previous_day_str=two_days_ago_str) %}
+        {% end %}
+        
+      </div><!-- /.col-sm-6 -->
+      <div class="col-sm-4 col-sm-pull-8">
+        
+        {% include post_sidebar.html %}
+        
+      </div><!-- /.col-sm-6 -->
+    </div><!-- /.row -->
+  </div>
+{% end %}
+
+{% block javascript %}
+  <script type="text/javascript">
+    $(document).ready(function() {
+      
+      /*
+      #
+      # Featured Post
+      #
+      */
+      $('#pinned .excerpt p:first-child').show()
+      
+      /*
+      #
+      # Voted Users Popover
+      #
+      */
+      var setupVotedListPopover = function() {
+        $('ul.feed .votes-count').each(function() {
+          var options = {
+            'content': $(this).siblings('.voted_users').html(),
+            'placement': 'bottom',
+            'trigger': 'hover',
+            'html': true,
+            'delay': {'show': 500, 'hide': 500}
+          }
+          $(this).popover(options)
+        });
+      }
+      setupVotedListPopover();
+      
+      var fixXSPostHeights = function() {
+        $('.post-xs.odd').each(function() {
+          console.log($(this).next().height())
+          if ($(this).next().height() < $(this).height()) {
+            $(this).next().height($(this).height());
+          }
+          if ($(this).next().height() > $(this).height()) {
+            $(this).height($(this).next().height());
+          }
+        });
+      }
+      fixXSPostHeights();
+      $(window).resize(fixXSPostHeights);
+      
+      /*
+      #
+      # Sort Day Posts
+      #
+      */
+      function sortDateDescending(a, b) {
+        var timestamp1 = $(a).attr('data-date-created');
+        date1 = new Date(timestamp1);
+        var timestamp2 = $(b).attr('data-date-created');
+        date2 = new Date(timestamp2);
+        return date1 < date2 ? 1 : -1;
+      }
+      
+      function sortScoreDescending(a, b) {
+        var score1 = parseFloat($(a).attr('data-sort-score'));
+        var score2 = parseFloat($(b).attr('data-sort-score'));
+        return score1 < score2 ? 1 : -1;
+      }
+      
+      $('body').on('click', '.sort-day-hot', function(e) {
+        e.preventDefault();
+        day = $(this).attr('data-date');
+        /*ul = "ul[data-date='"+ day +"']";*/
+        ul = "#todays-posts ul.feed";
+        li = "#todays-posts ul.feed li.post";
+        sorted = $(li).sort(sortScoreDescending);
+        console.log("hot");
+        console.log(sorted)
+        $(ul).html(sorted);
+        $(this).parent().siblings().removeClass('active');
+        $(this).parent().addClass('active');
+      });
+      $('body').on('click', '.sort-day-new', function(e) {
+        e.preventDefault();
+        day = $(this).attr('data-date');
+        /*ul = "ul[data-date='"+ day +"']";*/
+        ul = "#todays-posts ul.feed";
+        li = "#todays-posts ul.feed li.post";
+        sorted = $(li).sort(sortDateDescending);
+        console.log("date");
+        console.log(sorted);
+        $(ul).html(sorted);
+        $(this).parent().siblings().removeClass('active');
+        $(this).parent().addClass('active');
+      });
+      
+      /*
+      #
+      # Excerpt Sliders
+      #
+      */
+      $('body').on('click', '.post-sm .meta-top', function(e) {
+        $excerpt = $(this).siblings('.content').find('.excerpt');
+        if (!$excerpt.is(':visible')) {
+          // open it
+          $excerpt.slideDown();
+        } else {
+          // close it
+          $excerpt.slideUp();
+        }
+      });
+      $('body').on('click', '.post-xs .link', function(e) {
+        $excerpt = $(this).siblings('.excerpt');
+        if (!$excerpt.is(':visible')) {
+          // open it
+          $excerpt.slideDown();
+        } else {
+          // close it
+          $excerpt.slideUp();
+        }
+      });
+      $('body').on('click', '.post-sm .excerpt', function(e) {
+        if ($(this).is(':visible')) {
+          // close it
+          $excerpt.slideUp();
+        }
+      });
+      $('body').on('click', '.post-sm .link', function(e) {
+        $excerpt = $($(this).siblings('.excerpt')[0]);
+        if (!$excerpt.is(':visible')) {
+          // open it
+          $excerpt.slideDown();
+        } else {
+          // close it
+          $excerpt.slideUp();
+        }
+      });
+      
+      /*
+      #
+      # Excerpt special links
+      #
+      */
+      $('body').on('mouseover', '.feed .post', function(e) {
+          $(this).addClass('hover');
+      });
+      
+      $('body').on('mouseout', '.feed .post', function(e) {
+          $(this).removeClass('hover');
+      });
+      /*
+      $('body').on('mouseover', '.feed .excerpt', function(e) {
+          $(this).addClass('hover');
+      });
+      $('body').on('mouseout', '.feed .excerpt', function(e) {
+          $(this).removeClass('hover');
+      });
+      $('body').on('mouseover', '.feed .link', function(e) {
+          $(this).addClass('hover');
+      });
+      $('body').on('mouseout', '.feed .link', function(e) {
+          $(this).removeClass('hover');
+      });
+      */
+      /*
+      $('body').on('click', '.feed .link', function(e) {
+        link = $(this).attr('data-post-url');
+        window.location = link;
+      });*/
+      
+      /*
+      #
+      # Infinite Scroll
+      #
+      */
+      {% if infinite_scroll %}
+      $('#posts').jscroll({
+        contentSelector: '.feed-container',
+        loadingHtml: '<img style="clear:both" src="/static/img/ajax-loader.gif" />',
+        callback: onScrollLoad
+      });
+      {% end %}
+      function onScrollLoad() {
+        setupVotedListPopover();
+        fixXSPostHeights();
+      }
+      
+      if (window.location.hash == "#tools") {
+        $("#tools").modal('show');
+      }
+      $('#show-tools-btn').click(function(e) {
+        $("#tools").modal('show');
+      });
+      $('#bookmarklet').click(function(e) {
+        e.preventDefault();
+        alert('This is a bookmarklet.  First drag it to your bookmarks bar, then you can use it to share web pages to USV.com.');
+      })
+      fp_max_height = 0;
+      $('.featured-post').each(function() {
+        if ($(this).height() > fp_max_height) {
+          fp_max_height = $(this).height();
+        }
+      })
+      if ($('.featured-post:visible').length == 2) {
+        /* only do this on ipad where we're showing two at the top */
+        $('.featured-post').height(fp_max_height);
+      }
+      {% if current_user %}
+        $('#submit-modal .submit').show();
+        {% if current_user in settings.get('staff') %}
+          $('#submit-modal .login').hide();
+          $('#submit-modal .submit-staff').show();
+          $('a.mute').click(function(e) {
+            e.preventDefault();
+            if (confirm("are you sure?")) {
+              window.location = this.href;
+            }
+          })
+        {% else %}
+          $('#submit-modal .login').show();
+        {% end %}
+      {% end %}
+      
+      /*
+      #
+      # Tag Weighting
+      #
+      */
+      function compare(a,b){
+        return a-b;
+      }
+      var counts = []
+      $("ul.tags a").each(function() {
+        var count = parseInt($(this).attr('data-tag-count'));
+        counts.push(count)
+      });
+      counts.sort(compare);
+      low = counts[0];
+      high = counts[counts.length-1];
+      var scores = {}
+      for (var i = 0; i < counts.length; i++) {
+        score = (counts[i] * 1 / high + 1) * 100;
+        scores[counts[i]] = score;
+      }
+      $("ul.tags a").each(function() {
+        var count = parseInt($(this).attr('data-tag-count'));
+        $(this).css('font-size', scores[count] + "%");
+      });
+      
+    }); 
+  </script>
+{% end %}

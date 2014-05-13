@@ -1,0 +1,41 @@
+{% extends '../base.html' %}
+
+{% block body_class %}conversation{% end %}
+
+{% block content %}
+  <div id="main" role="main">
+    <section class=" centered clearfix">
+      <h2 class="section-heading" style="margin-top:0">Featured Posts</h2>
+      <div class="row">
+        {% for p in featured_posts %}
+          {% include featured_post_snippet.html %}
+        {% end %}
+      </div>
+      {% if 'page' in locals() %}
+      <div id="pagination-next-prev" style="margin-top: 20px;">
+          {%  if page == 2 %}
+          <a href="/{{ sort_by }}" class="btn btn-default prev pull-left">Previous</a>
+          {% elif page != 1 %}
+          <a href="/{{ sort_by }}/page/{{ page - 1 }}" class="prev btn btn-default pull-left">Previous</a>
+          {% end %}
+          <a href="/{{ sort_by }}/page/{{ page + 1 }}" class="btn btn-default next pull-right">Next</a>
+        </div>
+      {% end %}
+    </section>
+  </div>
+{% end %}
+
+{% block javascript %}
+  <script>
+    $(document).ready(function() {
+      rp_max_height = 0;
+      $('.featured-post').each(function() {
+        if ($(this).height() > rp_max_height) {
+          rp_max_height = $(this).height();
+        }
+      })
+      $('.featured-post').height(rp_max_height);
+    });
+  </script>
+{% end %}
+

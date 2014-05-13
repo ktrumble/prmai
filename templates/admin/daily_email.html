@@ -1,0 +1,19 @@
+{% extends '../base.html' %}
+{% block title %}Daily email | {% end %}
+
+{% block content %}
+	<form action="/admin/daily_email" method="POST">
+	
+	<div class="row">
+		<div class="col-sm-8">
+			<p><input type="submit" class="btn" name="action" value="setup_email" /></p>
+			<p><input type="submit" class="btn" name="action" value="add_list_to_email" /></p>
+			<p><input type="submit" class="btn" name="action" value="send_email" /></p>
+		</div>
+	</div>
+	</form>
+	
+{% end %}
+
+{% block javascript %}
+{% end %}
