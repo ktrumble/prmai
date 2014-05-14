@@ -349,8 +349,8 @@ class ListPosts(app.basic.BaseHandler):
     if is_edit:
       self.redirect('/posts/%s?msg=updated' % post['slug'])
     else:
-      self.redirect('/posts/%s' % post['slug'])
-#      self.redirect('/?msg=success&slug=%s' % post['slug'])
+#      self.redirect('/posts/%s' % post['slug'])
+      self.redirect('/?msg=success&slug=%s' % post['slug'])
 
 
 ##############

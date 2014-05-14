@@ -14,35 +14,35 @@
 
 {% block content %}
 
-  <div id="main" role="main">    
+  <div id="main" role="main">
     <div class="row">
       <div class="col-md-8 col-md-push-4 col-sm-12" id="posts">
 
         {% if msg == "success" and new_post %}
           <div class="alert alert-success" style="color: #333">
             <p style="margin-top:0"><strong>Thanks!</strong> &nbsp; Your post has been published.</p>
-            <p>Here's the link: <a href="/posts/{{ new_post['slug'] }}">http://usv.com/posts/{{ new_post['slug'] }}</a>. </p>
-            <p style="margin: 10px 0 0"> 
-             
+            <p>Here's the link: <a href="/posts/{{ new_post['slug'] }}">/posts/{{ new_post['slug'] }}</a>. </p>
+            <p style="margin: 10px 0 0">
+
               <a href="https://twitter.com/share" class="twitter-share-button" data-url="{{ template_helpers.post_permalink(new_post) }}" data-text="{{ new_post['title'] }}" data-via="usvcommunity" data-size="large" data-count="none">Tweet it out</a>
               <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
             </p>
-            
+
             {% if 'disqus_user_id' in user_obj.keys() and 'disqus' not in user_obj.keys() %}
             <div class="alert alert-danger" style="margin: 10px 0 0">
               <b>Yowzas!</b> Your connection to Disqus has expired.  <br /><a href="/auth/disqus">Click here to reauthorize</a> and receive email notifications of comments on your post.
             </div>
             {% end %}
-            
+
             {% if 'disqus_user_id' not in user_obj.keys() and 'disqus' not in user_obj.keys() %}
             <div class="alert alert-warning" style="margin: 10px 0 0">
               <b><a href="/auth/disqus">Connect to Disqus</a></b> to receive emails notifications of new comments on your post.
             </div>
             {% end %}
-            
+
           </div>
         {% end %}
-        
+
         {% if len(featured_posts) > 0 %}
         <div class="subsection section-heading day-heading featured clearfix">
           <h2 class="pull-left">
@@ -58,20 +58,20 @@
           {% end %}
         </ul>
         {% end %}
-        
+
         <div id="todays-posts">
         {% include daily_posts_list_snippet.html %}
         </div>
-        
+
         {% if len(posts) < 5 %}
         {% module daily_posts_list_snippet(day=previous_day, datetime=datetime, posts=previous_day_posts, current_user_can=current_user_can, midpoint=midpoint, is_today=False, day_str=day_str, previous_day_str=two_days_ago_str) %}
         {% end %}
-        
+
       </div><!-- /.col-sm-6 -->
       <div class="col-sm-4 col-sm-pull-8">
-        
+
         {% include post_sidebar.html %}
-        
+
       </div><!-- /.col-sm-6 -->
     </div><!-- /.row -->
   </div>
@@ -80,14 +80,14 @@
 {% block javascript %}
   <script type="text/javascript">
     $(document).ready(function() {
-      
+
       /*
       #
       # Featured Post
       #
       */
       $('#pinned .excerpt p:first-child').show()
-      
+
       /*
       #
       # Voted Users Popover
@@ -106,7 +106,7 @@
         });
       }
       setupVotedListPopover();
-      
+
       var fixXSPostHeights = function() {
         $('.post-xs.odd').each(function() {
           console.log($(this).next().height())
@@ -120,7 +120,7 @@
       }
       fixXSPostHeights();
       $(window).resize(fixXSPostHeights);
-      
+
       /*
       #
       # Sort Day Posts
@@ -133,13 +133,13 @@
         date2 = new Date(timestamp2);
         return date1 < date2 ? 1 : -1;
       }
-      
+
       function sortScoreDescending(a, b) {
         var score1 = parseFloat($(a).attr('data-sort-score'));
         var score2 = parseFloat($(b).attr('data-sort-score'));
         return score1 < score2 ? 1 : -1;
       }
-      
+
       $('body').on('click', '.sort-day-hot', function(e) {
         e.preventDefault();
         day = $(this).attr('data-date');
@@ -166,7 +166,7 @@
         $(this).parent().siblings().removeClass('active');
         $(this).parent().addClass('active');
       });
-      
+
       /*
       #
       # Excerpt Sliders
@@ -208,7 +208,7 @@
           $excerpt.slideUp();
         }
       });
-      
+
       /*
       #
       # Excerpt special links
@@ -217,7 +217,7 @@
       $('body').on('mouseover', '.feed .post', function(e) {
           $(this).addClass('hover');
       });
-      
+
       $('body').on('mouseout', '.feed .post', function(e) {
           $(this).removeClass('hover');
       });
@@ -240,7 +240,7 @@
         link = $(this).attr('data-post-url');
         window.location = link;
       });*/
-      
+
       /*
       #
       # Infinite Scroll
@@ -257,7 +257,7 @@
         setupVotedListPopover();
         fixXSPostHeights();
       }
-      
+
       if (window.location.hash == "#tools") {
         $("#tools").modal('show');
       }
@@ -293,7 +293,7 @@
           $('#submit-modal .login').show();
         {% end %}
       {% end %}
-      
+
       /*
       #
       # Tag Weighting
@@ -319,7 +319,7 @@
         var count = parseInt($(this).attr('data-tag-count'));
         $(this).css('font-size', scores[count] + "%");
       });
-      
-    }); 
+
+    });
   </script>
 {% end %}
