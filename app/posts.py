@@ -38,7 +38,7 @@ class NewPost(app.basic.BaseHandler):
     is_bookmarklet = False
     if self.request.path.find('/bookmarklet') == 0:
       is_bookmarklet = True
-      
+
     self.render('post/new_post.html', post=post, is_bookmarklet=is_bookmarklet)
 
 ###############
@@ -116,12 +116,12 @@ class ListPosts(app.basic.BaseHandler):
     new_post = None
     if slug:
       new_post = postsdb.get_post_by_slug(slug)
-      
+
     featured_posts = postsdb.get_featured_posts(1)
     posts = []
     post = {}
     hot_tags = tagsdb.get_hot_tags()
-    
+
     is_today = False
     if day == "today":
       is_today = True
@@ -130,17 +130,17 @@ class ListPosts(app.basic.BaseHandler):
       day = datetime.strptime(day, "%Y-%m-%d")
     previous_day = day - timedelta(days=1)
     two_days_ago = previous_day - timedelta(days=1)
-    
+
     day_str = str(date(day.year, day.month, day.day))
     previous_day_str = str(date(previous_day.year, previous_day.month, previous_day.day))
     two_days_ago_str = str(date(two_days_ago.year, two_days_ago.month, two_days_ago.day))
-    
+
     show_day_permalink = True
     infinite_scroll = False
     if self.request.path == ('/'):
       show_day_permalink = False
       infinite_scroll = True
-    
+
     is_blacklisted = False
     if self.current_user:
       is_blacklisted = self.is_blacklisted(self.current_user)
@@ -148,8 +148,8 @@ class ListPosts(app.basic.BaseHandler):
     posts = postsdb.get_hot_posts_by_day(day)
     #posts = postsdb.get_hot_posts_24hr()
     previous_day_posts = postsdb.get_hot_posts_by_day(previous_day)
-    
-    
+
+
     #midpoint = (len(posts) - 1) / 2
     # midpoint determines where post list breaks from size=md to size=sm
     midpoint = 7
@@ -168,7 +168,7 @@ class ListPosts(app.basic.BaseHandler):
       'is_blacklisted': is_blacklisted,
       'tags': hot_tags,
       'day': day,
-      'day_str': day_str,      
+      'day_str': day_str,
       'previous_day': previous_day,
       'previous_day_str': previous_day_str,
       'two_days_ago': two_days_ago,
@@ -190,7 +190,7 @@ class ListPosts(app.basic.BaseHandler):
     msg = 'success'
     if self.current_user:
       is_blacklisted = self.is_blacklisted(self.current_user)
-    
+
     post = {}
     post['slug'] = self.get_argument('slug', None)
     post['title'] = self.get_argument('title', '')
@@ -244,11 +244,11 @@ class ListPosts(app.basic.BaseHandler):
       ok_to_post = True
       dups = postsdb.get_posts_by_normalized_url(post.get('normalized_url', ""), 1)
       if post['url'] != '' and len(dups) > 0 and bypass_dup_check != "true":
-        ## 
+        ##
         ## If there are dupes, kick them back to the post add form
         ##
         return (self.render('post/new_post.html', post=post, dups=dups))
-        
+
       # Handle tags
       post['tags'] = [t.strip().lower() for t in post['tags']]
       post['tags'] = [t for t in post['tags'] if t]
@@ -322,7 +322,7 @@ class ListPosts(app.basic.BaseHandler):
           acc = userdb.get_user_by_screen_name(u)
           if acc:
             self.send_email('web@usv.com', acc['email_address'], subject, text)
-  
+
     # Subscribe to Disqus
     # Attempt to create the post's thread
     acc = userdb.get_user_by_screen_name(self.current_user)
@@ -349,7 +349,8 @@ class ListPosts(app.basic.BaseHandler):
     if is_edit:
       self.redirect('/posts/%s?msg=updated' % post['slug'])
     else:
-      self.redirect('/?msg=success&slug=%s' % post['slug'])
+      self.redirect('/posts/' % post['slug'])
+#      self.redirect('/?msg=success&slug=%s' % post['slug'])
 
 
 ##############
@@ -381,8 +382,8 @@ class ListPostsNew(app.basic.BaseHandler):
     })
     self.render('post/list_new_posts.html', **self.vars)
 
- 
-      
+
+
 ##########################
 ### Bump Up A SPECIFIC POST
 ### /posts/([^\/]+)/bump
@@ -404,13 +405,13 @@ class Bump(app.basic.BaseHandler):
           msg = {'error': 'You have already upvoted this post.'}
         else:
           user = userdb.get_user_by_screen_name(self.current_user)
-          
+
           # Increment the vote count
           post['votes'] += 1
           post['voted_users'].append(user['user'])
           postsdb.save_post(post)
           msg = {'votes': post['votes']}
-          
+
           # send email notification to post author
           author = userdb.get_user_by_screen_name(post['user']['username'])
           if 'email_address' in author.keys():
@@ -418,7 +419,7 @@ class Bump(app.basic.BaseHandler):
             text = "Woo!\n\n%s" % template_helpers.post_permalink(post)
             logging.info('sent email to %s' % author['email_address'])
             self.send_email('web@usv.com', author['email_address'], subject, text)
-          
+
     self.api_response(msg)
 
 ##########################
@@ -468,7 +469,7 @@ class SuperDownVote(app.basic.BaseHandler):
           msg = {'supervotes': post['super_downvotes']}
 
     self.api_response(msg)
-    
+
 ##########################
 ### Un-Bump A SPECIFIC POST
 ### /posts/([^\/]+)/unbump
@@ -505,8 +506,8 @@ class ViewPost(app.basic.BaseHandler):
   def get(self, slug):
     post = postsdb.get_post_by_slug(slug)
     if not post:
-      raise tornado.web.HTTPError(404)  
-    
+      raise tornado.web.HTTPError(404)
+
     tag_posts = []
     all_keeper_posts = []
     if 'tags' in post.keys() and len(post['tags']) > 0:
@@ -522,25 +523,25 @@ class ViewPost(app.basic.BaseHandler):
           'posts': tag_keeper_posts
         }
         tag_posts.append(obj)
-    
-    msg = self.get_argument('msg', None)  
-    
+
+    msg = self.get_argument('msg', None)
+
     user = None
     if self.current_user:
       user = userdb.get_user_by_screen_name(self.current_user)
-    
+
     # remove dupes from voted_users
     voted_users = []
     for i in post['voted_users']:
       if i not in voted_users:
         voted_users.append(i)
     post['voted_users'] = voted_users
-    
+
     hot_posts_past_week = postsdb.get_hot_posts_past_week()
     featured_posts = {}
-    
+
     view = "single"
-    
+
     self.render('post/view_post.html', user_obj=user, post=post, msg=msg, tag_posts=tag_posts, hot_posts_past_week=hot_posts_past_week, featured_posts=featured_posts, view=view)
 
 #############
@@ -563,7 +564,7 @@ class Widget(app.basic.BaseHandler):
         # get the current hot posts
         posts = postsdb.get_hot_posts(per_page, page)
         self.render('post/widget.js', posts=posts, num_posts=num_posts)
-      else: 
+      else:
         posts = postsdb.get_hot_posts_by_day()
         self.render('post/widget_inline.js', posts=posts, num_posts=3)
 
@@ -574,4 +575,3 @@ class Widget(app.basic.BaseHandler):
 class WidgetDemo(app.basic.BaseHandler):
   def get(self, extra_path=''):
     self.render('post/widget_demo.html')
-
